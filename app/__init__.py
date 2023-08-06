@@ -33,9 +33,9 @@ migrate = Migrate(app, db)
 
 # Create the S3 client
 s3 = boto3.client('s3',
-                  aws_access_key_id=app.config['YOUR_AWS_ACCESS_KEY_ID'],
-                  aws_secret_access_key=app.config['YOUR_AWS_SECRET_ACCESS_KEY'],
-                  region_name=app.config['YOUR_AWS_REGION_NAME'])
+                  aws_access_key_id=app.config['AWS_ACCESS_KEY_ID'],
+                  aws_secret_access_key=app.config['AWS_SECRET_ACCESS_KEY'],
+                  region_name=app.config['AWS_REGION_NAME'])
 
 profileImageS3Bucket = app.config['S3_PROFILE_IMAGE_BUCKET_NAME']
 
