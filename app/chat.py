@@ -14,9 +14,6 @@ google_api_key = os.environ.get("GOOGLE_API_KEY")
 search_engine_id = os.environ.get("GOOGLE_SEARCH_ENGINE_ID")
 google_search_url = "https://www.googleapis.com/customsearch/v1"
 
-# Create a new OpenAI object with your API key.
-#client = openai.OpenAI(api_key=openai.api_key)
-
 # List of fashion brands and clothing items
 fashion_brands = [    "Gucci", "Prada", "Versace", "Armani", "Dolce & Gabbana", "Tom Ford", "Chanel", "Dior", "Burberry", "Louis Vuitton","Balenciaga",
                       "Yves Saint Laurent", "Givenchy", "Fendi", "Valentino", "Marc Jacobs", "Michael Kors", "Coach",
