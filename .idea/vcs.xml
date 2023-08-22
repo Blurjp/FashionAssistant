@@ -15,6 +15,10 @@
           <option name="issueRegexp" value="\(#(\d+)\)" />
           <option name="linkRegexp" value="https://linkedin.ghe.com/jianphua/jianphuangtest/issues/$1" />
         </IssueNavigationLink>
+        <IssueNavigationLink>
+          <option name="issueRegexp" value="\(#(\d+)\)" />
+          <option name="linkRegexp" value="https://https///github.com/Blurjp/FashionAssistant/issues/$1" />
+        </IssueNavigationLink>
       </list>
     </option>
   </component>

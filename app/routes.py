@@ -3,21 +3,15 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from app.chat import send_message_to_chatgpt, extract_items_from_response, perform_google_search
 from authlib.integrations.flask_client import OAuth
 from app.models import User
-from app import login_manager, db, s3, profileImageS3Bucket
+from app import login_manager, db, image_processing_service_url
 from werkzeug.security import check_password_hash, generate_password_hash
 from uuid import uuid4
-from botocore.exceptions import ClientError
-import requests
-import json
-
-
-IMAGE_PROCESSING_SERVICE_URL = "http://your-image-processing-service/api/process_image"
+from .utils import upload_profile_image, send_images_to_process
 
 routes = Blueprint('routes', __name__)
 oauth = OAuth()
 google = None
 microsoft = None
-
 
 def init_app(app):
     global google, microsoft
@@ -199,61 +193,37 @@ def signup_modal():
 
 @routes.route('/upload_portrait', methods=['POST'])
 def upload_portrait():
-
-    if not current_user.is_authenticated:
-        return jsonify({"error": "User not authenticated"}), 401
-
-    if 'portrait' not in request.files:
-        return jsonify({"error": "No file selected"}), 400
-
-    portrait_file = request.files['portrait']
-
-    if portrait_file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-
-    # Generate a unique filename for the uploaded image
-    filename = f"{current_user.id}_{portrait_file.filename}"
-    print('inside upload:', profileImageS3Bucket)
-
-    cloth_image_url = 'https://www.net-a-porter.com/variants/images/1647597286238983/in/w1365_q80.jpg'
-
     try:
-        # Upload the portrait file to S3
-        s3.upload_fileobj(portrait_file, profileImageS3Bucket, filename)
+        if not current_user.is_authenticated:
+            return jsonify({"error": "User not authenticated"}), 401
 
-        # Get the URL of the uploaded image
-        s3_url = f"https://{profileImageS3Bucket}.s3.amazonaws.com/{filename}"
+        if 'portrait' not in request.files:
+            return jsonify({"error": "No file selected"}), 400
+
+        portrait_file = request.files['portrait']
+
+        if portrait_file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+
+        filename = f"{current_user.id}_{portrait_file.filename}"
+
+        cloth_image_url = 'https://www.net-a-porter.com/variants/images/1647597286238983/in/w1365_q80.jpg'
+
+        # Upload the portrait file to S3 and get the URL
+        s3_url = upload_profile_image(portrait_file, filename)
 
         # Store the profile image URL in the database
-        current_user.profile_picture = s3_url
+        current_user.profile_picture_url = s3_url
         db.session.commit()
 
-        send_images_to_process(current_user.id, s3_url, cloth_image_url)
+        send_images_to_process(current_user.id, image_processing_service_url, current_user.profile_picture_url, cloth_image_url)
 
         return jsonify({"message": "Profile image uploaded successfully", "image_url": s3_url}), 200
 
-    except ClientError as e:
-        if e.response['Error']['Code'] == 'EntityAlreadyExists':
-            print("User already exists")
-        else:
-            print("Unexpected error: %s" % e)
-        return jsonify({"error": "Failed to upload image to S3"}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-def send_images_to_process(user_id, profile_image_url, cloth_image_url):
-    url = "http://localhost:5000/acceptImages"  # replace with your actual Flask server URL
-    data = {
-        'user_id': user_id,
-        'profile_image_url': profile_image_url,
-        'cloth_image_url': cloth_image_url
-    }
-    headers = {'Content-Type': 'application/json'}
 
-    response = requests.post(url, data=json.dumps(data), headers=headers)
 
-    if response.status_code == 200:
-        print("Images sent successfully.")
-        return response.json()["final_image_s3_url"]
-    else:
-        print(f"Failed to send images. Status code: {response.status_code}")
-        return None
+
 

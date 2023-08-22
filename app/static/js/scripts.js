@@ -29,6 +29,47 @@ $(document).ready(function () {
     $("#chat-box").hide();
   });
 
+  $(".upload-portrait-btn").click(function(e) {
+    e.preventDefault();
+    if (isUserAuthenticated) {
+      $("#portrait-file").click();
+      console.log("portrait-file click")
+    } else {
+      // If the user is not authenticated, show the login modal to prompt login
+      $("#login-modal").show();
+    }
+  });
+
+  $("#portrait-file").change(function() {
+    console.log("portrait-file")
+    const file = this.files[0];
+    if (!file) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("portrait", file);
+
+    // Send the file data to the server using an AJAX request
+    $.ajax({
+      url: fileUploadUrl,
+      method: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function(response) {
+        // Handle the server response, if needed
+        console.log("Upload successful:", response);
+        // You can show a success message or trigger further actions based on the server response
+        showUploadSuccessMessage();
+      },
+      error: function(xhr, status, error) {
+        // Handle errors, if any
+        console.error("Error uploading file:", error);
+      }
+    });
+  });
+
   $("#signup-modal .close").click(function(e) {
     e.preventDefault();
     $(this).closest("#signup-modal").hide();
@@ -66,9 +107,6 @@ $(document).ready(function () {
       console.log("errorThrown:", errorThrown);
       $("#login-error-message").text("Sorry, an error occurred. Please try again.");
     });
-
-
-
   });
 
   $("#signup-form").submit(function(event) {
@@ -156,4 +194,15 @@ function updateSearchResults(searchResults) {
 
 function openSignupPopup() {
   window.open('/signup', 'Signup', 'height=500,width=500');
+}
+
+// After the image is successfully uploaded, show the success message
+function showUploadSuccessMessage() {
+  const uploadSuccessDiv = document.querySelector('.upload-success');
+  uploadSuccessDiv.style.display = 'block';
+
+  // Hide the message after a few seconds
+  setTimeout(() => {
+    uploadSuccessDiv.style.display = 'none';
+  }, 5000); // Hide after 5 seconds (adjust the time as needed)
 }
