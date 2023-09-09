@@ -1,0 +1,31 @@
+{% extends 'index2.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+
+<div class="container">
+  <h1>Welcome, {{ current_user.username }}</h1>
+  <p>Email: {{ current_user.email }}</p>
+
+  <img src="{{ current_user.profile_picture }}" alt="Profile Picture">
+  <form action="{{ url_for('routes.upload_portrait') }}" method="post" enctype="multipart/form-data">
+    <label for="portrait">Update Profile Image:</label>
+    <input type="file" id="portrait" name="portrait" accept=".jpg, .jpeg, .png">
+    <button type="submit">Upload</button>
+  </form>
+</div>
+
+</body>
+
+<script>
+  var signupUrl = "{{ url_for('routes.signup') }}";
+  var indexUrl = "{{ url_for('routes.index') }}";
+  var loginUrl = "{{ url_for('routes.login') }}";
+  var processChatUrl = "{{ url_for('routes.process_chat') }}";
+  var isUserAuthenticated = {{ is_authenticated|lower }};
+  var fileUploadUrl = "{{ url_for('routes.upload_portrait') }}"
+</script>
+
+</html>
+{% endblock %}
