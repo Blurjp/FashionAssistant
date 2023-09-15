@@ -90,6 +90,25 @@ def login():
         return jsonify({'message': 'Logged in successfully', 'success': True})
     #return render_template('login.html')
 
+@routes.route('/process_images', methods=['POST'])
+def process_images():
+    # Gather the necessary data. This assumes the data is sent as JSON in the POST request.
+    data = request.json
+    user_id = current_user.id
+    profile_image_url = current_user.profile_picture
+    cloth_image_url = data['cloth_image_url']
+
+    # The image_process_url might be a constant or could be received from the frontend.
+    image_process_url = "http://your-image-process-service-url/"
+
+    final_image_url = send_images_to_process(user_id, image_process_url, profile_image_url, cloth_image_url)
+
+    if final_image_url:
+        return jsonify({"status": "success", "final_image_url": final_image_url}), 200
+    else:
+        return jsonify({"status": "error", "message": "Failed to process the images."}), 500
+
+
 @routes.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -105,13 +124,6 @@ def signup():
 
         # Create hashed password
         hashed_password = generate_password_hash(password, method='sha256')
-
-        # print("my password_hash", hashed_password)
-        # print("my login pass", password)
-        # if check_password_hash(hashed_password, password):
-        #     print("check_password_hash true")
-        # else:
-        #     print("check_password_hash false")
 
         print("Check if email already exists")
         # Check if email already exists

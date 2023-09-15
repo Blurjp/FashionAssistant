@@ -1,5 +1,16 @@
 $(document).ready(function () {
 
+  $(".clothes-item").hover(
+      function() { // Mouse over
+        $(this).find('.carousel').carousel({
+          interval: 2000
+        }).carousel('cycle');
+      },
+      function() { // Mouse out
+        $(this).find('.carousel').carousel('pause');
+      }
+  );
+
   $(".chat-button").click(function(e) {
     e.preventDefault();
     if (isUserAuthenticated) {
@@ -363,12 +374,10 @@ function fetchProfileImage(url, callback) {
 
 // Function to fetch a new presigned URL for the profile image.
 function fetchNewPresignedUrl(callback) {
-  //alert('fetchNewPresignedUrl');
   $.ajax({
     url: '/get-presigned-url', // Endpoint to generate presigned URL
     type: "GET",
     success: function (data) {
-      //alert(data.presigned_url);
       if (data && data.presigned_url) {
         callback(data.presigned_url);
       } else {
@@ -393,3 +402,71 @@ function closeProfileModal() {
   $("#profile-modal").hide();
   $(".modal-content").removeClass("show"); // Remove the class to hide the modal content
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+  const tryonLinks = document.querySelectorAll('.tryon-hover-bar');
+
+  tryonLinks.forEach(link => {
+    link.addEventListener('click', function (event) {
+      event.preventDefault();
+
+      // Get the sibling image of the clicked link
+      const imageElement = event.target.previousElementSibling;
+
+      // Retrieve the data attributes from the image
+      const clothesId = imageElement.getAttribute('data-clothes-id');
+      const cloth_image_url = imageElement.getAttribute('data-clothes-link');
+
+      console.log('Clicked on:', clothesId, clothesName);
+
+      // Show the loading bar
+      const loadingBar = document.querySelector('.loading-bar');
+      loadingBar.style.display = 'block';
+
+      // AJAX request to send the image information to the image processing service
+      fetch(imageProcessUrl, {
+        method: 'POST', headers: {
+          'Content-Type': 'application/json'
+        }, body: JSON.stringify({
+          clothesId: clothesId, cloth_image_url: cloth_image_url
+          // Add other data as required
+        })
+      })
+          .then(response => {
+            if (!response.ok) {  // Check if response status code is not in the 200-299 range
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Hide the loading bar
+            loadingBar.style.display = 'none';
+
+            // Show the processed image in a popup
+            const popupImage = document.querySelector('#processed-image');
+            popupImage.src = data.processedImageURL;
+
+            const popup = document.querySelector('.popup');
+            popup.style.display = 'block';
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            // Hide the loading bar
+            loadingBar.style.display = 'none';
+
+            // Provide feedback to the user
+            const feedbackDiv = document.querySelector('#feedback');
+            feedbackDiv.textContent = 'An error occurred while processing the image. Please try again later.';
+            feedbackDiv.style.display = 'block';
+          });
+    });
+
+    // Close popup functionality
+    const closePopupBtn = document.querySelector('#close-popup');
+    closePopupBtn.addEventListener('click', function () {
+      const popup = document.querySelector('.popup');
+      popup.style.display = 'none';
+    });
+  });
+});
+

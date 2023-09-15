@@ -88,7 +88,7 @@ def send_images_to_process(user_id, image_process_url, profile_image_url, cloth_
 
     if response.status_code == 200:
         print("Images sent successfully.")
-        return response.json()["final_image_s3_url"]
+        return response.json()["final_image_s3_presigned_url"]
     else:
         print(f"Failed to process the images. Status code: {response.status_code}")
         return None
