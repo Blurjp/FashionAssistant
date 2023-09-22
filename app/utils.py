@@ -80,7 +80,7 @@ def send_images_to_process(user_id, image_process_url, profile_image_url, cloth_
         'user_id': user_id,
         'profile_image_url': profile_image_url,
         'cloth_image_url': cloth_image_url,
-        'image_id': uuid.uuid4()
+        'image_id': str(uuid.uuid4())
     }
     headers = {'Content-Type': 'application/json'}
 

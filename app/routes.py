@@ -90,18 +90,25 @@ def login():
         return jsonify({'message': 'Logged in successfully', 'success': True})
     #return render_template('login.html')
 
-@routes.route('/process_images', methods=['POST'])
+@routes.route('/api/process_images', methods=['POST'])
 def process_images():
     # Gather the necessary data. This assumes the data is sent as JSON in the POST request.
     data = request.json
-    user_id = current_user.id
-    profile_image_url = current_user.profile_picture
-    cloth_image_url = data['cloth_image_url']
+    if current_user.is_authenticated:
+        user_id = current_user.id
+    else:
+        user_id = 1
+    #user_id = current_user.id
+    profile_image_pre_signed_url = generate_presigned_url(current_user.profile_picture)
+    #cloth_image_pre_signed_url = generate_presigned_url(data['cloth_image_url'])
+    cloth_image_pre_signed_url = generate_presigned_url('https://dev-fashion-assistant-cloth-image-bucket.s3.amazonaws.com/a23---balmain---bf1kl014kb070pa.jpg')
 
     # The image_process_url might be a constant or could be received from the frontend.
     image_process_url = "http://your-image-process-service-url/"
+    image_process_url = "http://192.168.1.118:5000/api/process_image"
+    print('called image_process_url')
 
-    final_image_url = send_images_to_process(user_id, image_process_url, profile_image_url, cloth_image_url)
+    final_image_url = send_images_to_process(user_id, image_process_url, profile_image_pre_signed_url, cloth_image_pre_signed_url)
 
     if final_image_url:
         return jsonify({"status": "success", "final_image_url": final_image_url}), 200

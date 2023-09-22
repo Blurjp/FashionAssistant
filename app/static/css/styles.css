@@ -82,7 +82,6 @@ body {
 }
 
 .tryon-hover-bar:hover,
-.tryon-hover-bar:active,
 .tryon-hover-bar:focus {
   text-decoration: none; /* Remove underline on hover */
   color: inherit;        /* Use the same color on hover and active states */

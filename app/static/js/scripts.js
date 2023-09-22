@@ -1,15 +1,25 @@
 $(document).ready(function () {
 
-  $(".clothes-item").hover(
-      function() { // Mouse over
-        $(this).find('.carousel').carousel({
-          interval: 2000
-        }).carousel('cycle');
-      },
-      function() { // Mouse out
-        $(this).find('.carousel').carousel('pause');
-      }
-  );
+  $(".clothes-item").hover(function () {
+    // Start the slide when hovered over the cloth item
+    const $carousel = $(this).find('.carousel');
+
+    if ($carousel.length > 0) {  // Check if the element exists
+      //alert('in');
+      $carousel.carousel({
+        interval: 2000
+      });
+      $carousel.carousel('cycle');
+    }
+  }, function () {
+    // Pause the slide when not hovered
+    const $carousel = $(this).find('.carousel');
+
+    if ($carousel.length > 0) {  // Check if the element exists
+      //alert('out');
+      $carousel.carousel('pause');
+    }
+  });
 
   $(".chat-button").click(function(e) {
     e.preventDefault();
@@ -417,7 +427,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const clothesId = imageElement.getAttribute('data-clothes-id');
       const cloth_image_url = imageElement.getAttribute('data-clothes-link');
 
-      console.log('Clicked on:', clothesId, clothesName);
+      console.log('Clicked on:', clothesId, cloth_image_url);
 
       // Show the loading bar
       const loadingBar = document.querySelector('.loading-bar');
