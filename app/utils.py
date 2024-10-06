@@ -38,7 +38,6 @@ def remove_background_from_image(image_file):
         output_io = io.BytesIO()
         output_image.save(output_io, format='PNG')
         output_io.seek(0)
-        print(type(output_io))  # Make sure this prints <class '_io.BytesIO'>
         return output_io
 
     except Exception as e:
@@ -90,7 +89,6 @@ def upload_profile_image(file, filename):
 
 def upload_to_s3(file, filename, bucket_name):
     try:
-        print('upload to s3')
         s3.upload_fileobj(file, bucket_name, filename)
         s3_url = f"https://{bucket_name}.s3.amazonaws.com/{filename}"
         return s3_url
@@ -122,7 +120,6 @@ def generate_presigned_url(file_key, bucket_name=profileImageS3Bucket, expiratio
     :param expiration: Time in seconds for which the URL is valid.
     :return: Presigned URL as a string.
     """
-
     try:
         response = s3.generate_presigned_url('get_object',
                                              Params={'Bucket': bucket_name, 'Key': file_key},

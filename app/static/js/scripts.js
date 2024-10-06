@@ -196,8 +196,6 @@ $(document).ready(function () {
             callback: handleGoogleSignup,  // Handle the sign-in response
         });
 
-        alert(googleClientId);
-
         google.accounts.id.renderButton(
             document.getElementById("google-signup-btn"),  // The container for the Google Sign-In button
             { theme: "outline", size: "large" }  // Customize the button's appearance
@@ -253,14 +251,15 @@ $(document).ready(function () {
   // Handle profile form submission
   $("#profile-form").submit(e => handleProfileFormSubmission(e));
 
-  function handleProfileFormSubmission(e) {
-    e.preventDefault();
+  //function handleProfileFormSubmission(e) {
+  //  e.preventDefault();
 
-    const formData = new FormData(e.target);
-    uploadProfileImage(formData);
-  }
+  //  const formData = new FormData(e.target);
+  //  uploadProfileImage(formData);
+  //}
 
-  function handleProfileFormSubmission(e) {
+    function handleProfileFormSubmission(e) {
+        //alert('handleProfileFormSubmission');
       e.preventDefault();
 
       if (cropper) {
@@ -280,7 +279,6 @@ $(document).ready(function () {
               uploadProfileImage(formData);
           });
       } else {
-
           const formData = new FormData(e.target);
           //uploadProfileImage(formData);
           // Show the spinner
@@ -293,7 +291,8 @@ $(document).ready(function () {
       }
   }
 
-  function uploadProfileImage(formData) {
+    function uploadProfileImage(formData) {
+    //alert(fileUploadUrl);
     $.ajax({
       url: fileUploadUrl,
       type: "POST",
@@ -446,7 +445,7 @@ function fetchProfileImage(url, callback) {
     } else {
         console.log("Fetching image from URL:", url);
     }
-
+    //print(url)
     $.ajax({
         url: url,
         type: 'GET',

@@ -194,15 +194,17 @@ def index():
 @login_required
 def upload_portrait():
     try:
+        print('upload_portrait')
         portrait_file = request.files.get('profile-image')
         if not portrait_file or not allowed_file(portrait_file.filename):
             return jsonify({"error": "Invalid or no file selected"}), 400
 
         output_io = remove_background_from_image(portrait_file)
-
+        print('Secure and make filename unique')
         # Secure and make filename unique
         filename = secure_filename(f"{current_user.id}_{uuid.uuid4().hex}_{portrait_file.filename}")
 
+        print('upload_profile_image')
         # Upload the portrait file to S3
         #upload_profile_image(portrait_file, filename)
         upload_profile_image_bytes(output_io, filename)
@@ -211,6 +213,7 @@ def upload_portrait():
         current_user.profile_picture = filename
         db.session.commit()
 
+        print('Generate a pre-signed URL for the uploaded image')
         # Generate a pre-signed URL for the uploaded image
         presigned_url = generate_presigned_url(filename)
 
@@ -223,6 +226,7 @@ def upload_portrait():
 @routes.route('/get-presigned-url', methods=['GET'])
 @login_required
 def get_profile_image_presigned_url():
+    print('get_profile_image_presigned_url')
     try:
         s3_key = current_user.profile_picture
         if not s3_key:
